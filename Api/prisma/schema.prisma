@@ -142,24 +142,42 @@ model area_monster {
 
   area area @relation(fields: [area_id], references: [id])
   // TODO:
-  // monster monster @relation(fields: [item_id], references: [id])
-  // @@index([item_id], map: "item_id")
+  // monster monster @relation(fields: [monster_id], references: [id])
+  // @@index([monster_id], map: "monster_id")
 
   @@index([area_id], map: "area_id")
   @@map("areas_monsters")
 }
 
 model job {
-  id                        BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  id                        BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
   category                  Category
-  description               String    @db.VarChar(255)
-  mana_regeneration_methods String    @db.VarChar(255)
-  stats_description         String    @db.VarChar(255)
-  created_at                DateTime  @default(now())
+  description               String      @db.VarChar(255)
+  mana_regeneration_methods String      @db.VarChar(255)
+  stats_description         String      @db.VarChar(255)
+  created_at                DateTime    @default(now())
   deleted_at                DateTime?
-  updated_at                DateTime  @updatedAt
+  updated_at                DateTime    @updatedAt
+  job_skill                 job_skill[]
 
   @@map("jobs")
+}
+
+model job_skill {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  job_id     BigInt    @db.UnsignedBigInt
+  skill_id   BigInt    @db.UnsignedBigInt
+  created_at DateTime  @default(now())
+  deleted_at DateTime?
+  updated_at DateTime  @updatedAt
+
+  job job @relation(fields: [job_id], references: [id])
+  // TODO:
+  // skill skill @relation(fields: [skill_id], references: [id])
+  // @@index([skill_id], map: "skill_id")
+
+  @@index([job_id], map: "job_id")
+  @@map("jobs_skills")
 }
 
 model character {
