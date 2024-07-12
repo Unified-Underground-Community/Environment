@@ -368,37 +368,38 @@ model item_requirement {
 }
 
 model monster {
-  id           BigInt         @id @default(autoincrement()) @db.UnsignedBigInt
-  element_id   BigInt         @db.UnsignedBigInt
-  race_id      BigInt         @db.UnsignedBigInt
-  level_id     BigInt         @db.UnsignedBigInt
-  team_id      BigInt         @db.UnsignedBigInt
-  category     ClassCategory
-  name         String         @db.VarChar(32)
-  file         String         @db.VarChar(64)
-  linkage      String         @db.VarChar(64)
-  gold         BigInt         @db.UnsignedBigInt
-  coins        BigInt         @db.UnsignedBigInt
-  experience   BigInt         @db.UnsignedBigInt
-  class_points BigInt         @db.UnsignedBigInt
-  health       BigInt         @db.UnsignedBigInt
-  mana         BigInt         @db.UnsignedBigInt
-  dps          BigInt         @db.UnsignedBigInt
-  range        BigInt         @db.UnsignedBigInt
-  wisdom       BigInt         @db.UnsignedBigInt
-  strength     BigInt         @db.UnsignedBigInt
-  luck         BigInt         @db.UnsignedBigInt
-  dexterity    BigInt         @db.UnsignedBigInt
-  endurance    BigInt         @db.UnsignedBigInt
-  intelligence BigInt         @db.UnsignedBigInt
-  created_at   DateTime       @default(now())
-  deleted_at   DateTime?
-  updated_at   DateTime       @updatedAt
-  area_monster area_monster[]
-  element      element        @relation(fields: [element_id], references: [id])
-  level        setting_level  @relation(fields: [level_id], references: [id])
-  race         race           @relation(fields: [race_id], references: [id])
-  monster_drop monster_drop[]
+  id            BigInt          @id @default(autoincrement()) @db.UnsignedBigInt
+  element_id    BigInt          @db.UnsignedBigInt
+  race_id       BigInt          @db.UnsignedBigInt
+  level_id      BigInt          @db.UnsignedBigInt
+  team_id       BigInt          @db.UnsignedBigInt
+  category      ClassCategory
+  name          String          @db.VarChar(32)
+  file          String          @db.VarChar(64)
+  linkage       String          @db.VarChar(64)
+  gold          BigInt          @db.UnsignedBigInt
+  coins         BigInt          @db.UnsignedBigInt
+  experience    BigInt          @db.UnsignedBigInt
+  class_points  BigInt          @db.UnsignedBigInt
+  health        BigInt          @db.UnsignedBigInt
+  mana          BigInt          @db.UnsignedBigInt
+  dps           BigInt          @db.UnsignedBigInt
+  range         BigInt          @db.UnsignedBigInt
+  wisdom        BigInt          @db.UnsignedBigInt
+  strength      BigInt          @db.UnsignedBigInt
+  luck          BigInt          @db.UnsignedBigInt
+  dexterity     BigInt          @db.UnsignedBigInt
+  endurance     BigInt          @db.UnsignedBigInt
+  intelligence  BigInt          @db.UnsignedBigInt
+  created_at    DateTime        @default(now())
+  deleted_at    DateTime?
+  updated_at    DateTime        @updatedAt
+  area_monster  area_monster[]
+  element       element         @relation(fields: [element_id], references: [id])
+  level         setting_level   @relation(fields: [level_id], references: [id])
+  race          race            @relation(fields: [race_id], references: [id])
+  monster_drop  monster_drop[]
+  monster_skill monster_skill[]
 
   @@index([element_id], map: "element_id")
   @@index([race_id], map: "race_id")
@@ -421,6 +422,21 @@ model monster_drop {
   @@index([monster_id], map: "monster_id")
   @@index([item_id], map: "item_id")
   @@map("monsters_drops")
+}
+
+model monster_skill {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  monster_id BigInt    @db.UnsignedBigInt
+  skill_id   BigInt    @db.UnsignedBigInt
+  created_at DateTime  @default(now())
+  deleted_at DateTime?
+  updated_at DateTime  @updatedAt
+  monster    monster   @relation(fields: [monster_id], references: [id])
+  skill      skill     @relation(fields: [skill_id], references: [id])
+
+  @@index([monster_id], map: "monster_id")
+  @@index([skill_id], map: "skill_id")
+  @@map("monsters_skills")
 }
 
 model quest {
@@ -618,26 +634,27 @@ model shop_item {
 }
 
 model skill {
-  id          BigInt         @id @default(autoincrement()) @db.UnsignedBigInt
-  name        String         @db.VarChar(32)
-  description String         @db.VarChar(255)
-  icon        String         @db.VarChar(255)
-  animation   String         @db.VarChar(64)
-  strl        String         @db.VarChar(64)
-  damage      Decimal        @db.Decimal(9, 2)
-  mana        BigInt         @db.UnsignedBigInt
-  cooldown    BigInt         @db.UnsignedBigInt
-  range       BigInt         @db.UnsignedBigInt
-  hits        BigInt         @db.UnsignedBigInt
-  reference   SkillReference
-  type        SkillType
-  target      SkillTarget
-  effect      SkillEffect
-  created_at  DateTime       @default(now())
-  deleted_at  DateTime?
-  updated_at  DateTime       @updatedAt
-  job_skill   job_skill[]
-  skill_aura  skill_aura[]
+  id            BigInt          @id @default(autoincrement()) @db.UnsignedBigInt
+  name          String          @db.VarChar(32)
+  description   String          @db.VarChar(255)
+  icon          String          @db.VarChar(255)
+  animation     String          @db.VarChar(64)
+  strl          String          @db.VarChar(64)
+  damage        Decimal         @db.Decimal(9, 2)
+  mana          BigInt          @db.UnsignedBigInt
+  cooldown      BigInt          @db.UnsignedBigInt
+  range         BigInt          @db.UnsignedBigInt
+  hits          BigInt          @db.UnsignedBigInt
+  reference     SkillReference
+  type          SkillType
+  target        SkillTarget
+  effect        SkillEffect
+  created_at    DateTime        @default(now())
+  deleted_at    DateTime?
+  updated_at    DateTime        @updatedAt
+  job_skill     job_skill[]
+  skill_aura    skill_aura[]
+  monster_skill monster_skill[]
 
   @@map("skills")
 }
@@ -694,12 +711,12 @@ model character {
   created_at        DateTime            @default(now())
   updated_at        DateTime            @updatedAt
   deleted_at        DateTime?
-  user              user                @relation(fields: [user_id], references: [id])
   access            access              @relation(fields: [access_id], references: [id])
   guild             guild?              @relation(fields: [guild_id], references: [id])
   hair              hair                @relation(fields: [hair_id], references: [id])
   level             setting_level       @relation(fields: [level_id], references: [id])
   server            server              @relation(fields: [server_id], references: [id])
+  user              user                @relation(fields: [user_id], references: [id])
   character_faction character_faction[]
   friends           character_friend[]  @relation("CharacterFriendCharacter")
   friend_by         character_friend[]  @relation("CharacterFriendFriend")
