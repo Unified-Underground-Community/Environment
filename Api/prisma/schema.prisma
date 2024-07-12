@@ -48,30 +48,6 @@ model server {
   @@map("servers")
 }
 
-model hair {
-  id         BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
-  gender     Gender
-  name       String      @db.VarChar(255)
-  file       String      @db.VarChar(255)
-  created_at DateTime    @default(now())
-  deleted_at DateTime?
-  updated_at DateTime    @updatedAt
-  characters character[]
-
-  @@map("hairs")
-}
-
-model guild {
-  id         BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
-  name       String      @db.VarChar(255)
-  created_at DateTime    @default(now())
-  deleted_at DateTime?
-  updated_at DateTime    @updatedAt
-  characters character[]
-
-  @@map("guilds")
-}
-
 model area {
   id            BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
   req_level_id  BigInt    @db.UnsignedBigInt
@@ -224,6 +200,58 @@ model faction {
   updated_at DateTime  @updatedAt
 
   @@map("factions")
+}
+
+model guild {
+  id         BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String      @db.VarChar(255)
+  created_at DateTime    @default(now())
+  deleted_at DateTime?
+  updated_at DateTime    @updatedAt
+  characters character[]
+
+  @@map("guilds")
+}
+
+model hair {
+  id             BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
+  gender         Gender
+  name           String           @db.VarChar(255)
+  file           String           @db.VarChar(255)
+  created_at     DateTime         @default(now())
+  deleted_at     DateTime?
+  updated_at     DateTime         @updatedAt
+  characters     character[]
+  hair_shop_item hair_shop_item[]
+
+  @@map("hairs")
+}
+
+model hair_shop {
+  id             BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
+  name           String           @db.VarChar(32)
+  created_at     DateTime         @default(now())
+  deleted_at     DateTime?
+  updated_at     DateTime         @updatedAt
+  hair_shop_item hair_shop_item[]
+
+  @@map("hairs_shops")
+}
+
+model hair_shop_item {
+  id           BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  hair_id      BigInt    @db.UnsignedBigInt
+  hair_shop_id BigInt    @db.UnsignedBigInt
+  created_at   DateTime  @default(now())
+  deleted_at   DateTime?
+  updated_at   DateTime  @updatedAt
+
+  hair      hair      @relation(fields: [hair_id], references: [id])
+  hair_shop hair_shop @relation(fields: [hair_shop_id], references: [id])
+
+  @@index([hair_id], map: "hair_id")
+  @@index([hair_shop_id], map: "hair_shop_id")
+  @@map("hairs_shops_items")
 }
 
 model character {
