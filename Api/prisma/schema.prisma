@@ -151,14 +151,14 @@ model area_monster {
 }
 
 model job {
-  id                        BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  id                        BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
   category                  Category
-  description               String        @db.VarChar(255)
-  mana_regeneration_methods String        @db.VarChar(255)
-  stats_description         String        @db.VarChar(255)
-  created_at                DateTime      @default(now())
+  description               String      @db.VarChar(255)
+  mana_regeneration_methods String      @db.VarChar(255)
+  stats_description         String      @db.VarChar(255)
+  created_at                DateTime    @default(now())
   deleted_at                DateTime?
-  updated_at                DateTime      @updatedAt
+  updated_at                DateTime    @updatedAt
   job_skill                 job_skill[]
 
   @@map("jobs")
@@ -213,7 +213,17 @@ model enhancement_pattern {
   updated_at   DateTime      @updatedAt
   enhancement  enhancement[]
 
-  @@map("enhancements_pattern")
+  @@map("enhancements_patterns")
+}
+
+model faction {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String    @db.VarChar(32)
+  created_at DateTime  @default(now())
+  deleted_at DateTime?
+  updated_at DateTime  @updatedAt
+
+  @@map("factions")
 }
 
 model character {
