@@ -149,6 +149,19 @@ model area_monster {
   @@map("areas_monsters")
 }
 
+model job {
+  id                        BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  category                  Category
+  description               String    @db.VarChar(255)
+  mana_regeneration_methods String    @db.VarChar(255)
+  stats_description         String    @db.VarChar(255)
+  created_at                DateTime  @default(now())
+  deleted_at                DateTime?
+  updated_at                DateTime  @updatedAt
+
+  @@map("jobs")
+}
+
 model character {
   id                BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
   access_id         BigInt        @db.UnsignedBigInt
@@ -201,4 +214,15 @@ model character {
 enum Gender {
   M
   F
+}
+
+enum Category {
+  M1
+  M2
+  M3
+  M4
+  C1
+  C2
+  C3
+  S1
 }
