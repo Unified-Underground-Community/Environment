@@ -288,16 +288,35 @@ model item {
   deleted_at             DateTime?
   updated_at             DateTime  @updatedAt
 
-  enhancement enhancement   @relation(fields: [enhancement_id], references: [id])
-  req_level   setting_level @relation(fields: [req_level_id], references: [id])
-  req_faction faction       @relation(fields: [req_faction_id], references: [id])
-  req_job     job           @relation(fields: [req_job_id], references: [id])
+  enhancement  enhancement        @relation(fields: [enhancement_id], references: [id])
+  req_level    setting_level      @relation(fields: [req_level_id], references: [id])
+  req_faction  faction            @relation(fields: [req_faction_id], references: [id])
+  req_job      job                @relation(fields: [req_job_id], references: [id])
+  requirements item_requirement[] @relation("ItemRequirements")
+  required_by  item_requirement[] @relation("RequiredBy")
 
   @@index([enhancement_id], map: "enhancement_id")
   @@index([req_level_id], map: "req_level_id")
   @@index([req_faction_id], map: "req_faction_id")
   @@index([req_job_id], map: "req_job_id")
   @@map("items")
+}
+
+model item_requirement {
+  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  item_id     BigInt    @db.UnsignedBigInt
+  req_item_id BigInt    @db.UnsignedBigInt
+  quantity    BigInt    @db.UnsignedBigInt
+  created_at  DateTime  @default(now())
+  deleted_at  DateTime?
+  updated_at  DateTime  @updatedAt
+
+  item     item @relation("ItemRequirements", fields: [item_id], references: [id])
+  req_item item @relation("RequiredBy", fields: [req_item_id], references: [id])
+
+  @@index([item_id], map: "item_id")
+  @@index([req_item_id], map: "req_item_id")
+  @@map("items_requirements")
 }
 
 model character {
