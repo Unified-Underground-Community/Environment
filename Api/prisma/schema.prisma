@@ -13,8 +13,8 @@ model access {
   created_at DateTime    @default(now())
   deleted_at DateTime?
   updated_at DateTime    @updatedAt
-  characters character[]
   area       area[]
+  characters character[]
 
   @@map("accesses")
 }
@@ -27,10 +27,11 @@ model setting_level {
   created_at     DateTime      @default(now())
   deleted_at     DateTime?
   updated_at     DateTime      @updatedAt
-  characters     character[]
   areas          area[]
+  characters     character[]
   enhancement    enhancement[]
   item           item[]
+  monster        monster[]
 
   @@map("settings_levels")
 }
@@ -50,24 +51,23 @@ model server {
 }
 
 model area {
-  id            BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  req_level_id  BigInt    @db.UnsignedBigInt
-  req_access_id BigInt    @db.UnsignedBigInt
-  name          String    @db.VarChar(255)
-  file          String    @db.VarChar(64)
-  max_players   BigInt    @db.UnsignedBigInt
+  id            BigInt         @id @default(autoincrement()) @db.UnsignedBigInt
+  req_level_id  BigInt         @db.UnsignedBigInt
+  req_access_id BigInt         @db.UnsignedBigInt
+  name          String         @db.VarChar(255)
+  file          String         @db.VarChar(64)
+  max_players   BigInt         @db.UnsignedBigInt
   is_upgrade    Boolean
   is_staff      Boolean
   is_pvp        Boolean
-  created_at    DateTime  @default(now())
+  created_at    DateTime       @default(now())
   deleted_at    DateTime?
-  updated_at    DateTime  @updatedAt
-
-  req_level    setting_level  @relation(fields: [req_level_id], references: [id])
-  req_access   access         @relation(fields: [req_access_id], references: [id])
-  cells        area_cell[]
-  area_item    area_item[]
-  area_monster area_monster[]
+  updated_at    DateTime       @updatedAt
+  req_access    access         @relation(fields: [req_access_id], references: [id])
+  req_level     setting_level  @relation(fields: [req_level_id], references: [id])
+  cells         area_cell[]
+  area_item     area_item[]
+  area_monster  area_monster[]
 
   @@index([req_level_id], map: "req_level_id")
   @@index([req_access_id], map: "req_access_id")
@@ -83,8 +83,7 @@ model area_cell {
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
-
-  area area @relation(fields: [area_id], references: [id])
+  area       area      @relation(fields: [area_id], references: [id])
 
   @@index([area_id], map: "area_id")
   @@map("areas_cells")
@@ -97,11 +96,7 @@ model area_item {
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
-
-  area area @relation(fields: [area_id], references: [id])
-  // TODO:
-  // item item @relation(fields: [item_id], references: [id])
-  // @@index([item_id], map: "item_id")
+  area       area      @relation(fields: [area_id], references: [id])
 
   @@index([area_id], map: "area_id")
   @@map("areas_items")
@@ -117,8 +112,7 @@ model area_monster {
   created_at    DateTime  @default(now())
   deleted_at    DateTime?
   updated_at    DateTime  @updatedAt
-
-  area area @relation(fields: [area_id], references: [id])
+  area          area      @relation(fields: [area_id], references: [id])
   // TODO:
   // monster monster @relation(fields: [monster_id], references: [id])
   // @@index([monster_id], map: "monster_id")
@@ -136,8 +130,8 @@ model job {
   created_at                DateTime    @default(now())
   deleted_at                DateTime?
   updated_at                DateTime    @updatedAt
-  job_skill                 job_skill[]
   item                      item[]
+  job_skill                 job_skill[]
 
   @@map("jobs")
 }
@@ -149,8 +143,7 @@ model job_skill {
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
-
-  job job @relation(fields: [job_id], references: [id])
+  job        job       @relation(fields: [job_id], references: [id])
   // TODO:
   // skill skill @relation(fields: [skill_id], references: [id])
   // @@index([skill_id], map: "skill_id")
@@ -159,19 +152,30 @@ model job_skill {
   @@map("jobs_skills")
 }
 
-model enhancement {
+model element {
   id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  level_id   BigInt    @db.UnsignedBigInt
-  pattern_id BigInt    @db.UnsignedBigInt
-  rarity     BigInt    @db.UnsignedBigInt
-  dps        BigInt    @db.UnsignedBigInt
+  name       String    @db.VarChar(32)
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
+  item       item[]
+  monster    monster[]
 
-  level   setting_level       @relation(fields: [level_id], references: [id])
-  pattern enhancement_pattern @relation(fields: [pattern_id], references: [id])
-  item    item[]
+  @@map("elements")
+}
+
+model enhancement {
+  id         BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
+  level_id   BigInt              @db.UnsignedBigInt
+  pattern_id BigInt              @db.UnsignedBigInt
+  rarity     BigInt              @db.UnsignedBigInt
+  dps        BigInt              @db.UnsignedBigInt
+  created_at DateTime            @default(now())
+  deleted_at DateTime?
+  updated_at DateTime            @updatedAt
+  level      setting_level       @relation(fields: [level_id], references: [id])
+  pattern    enhancement_pattern @relation(fields: [pattern_id], references: [id])
+  item       item[]
 
   @@index([level_id], map: "level_id")
   @@index([pattern_id], map: "pattern_id")
@@ -193,6 +197,41 @@ model enhancement_pattern {
   enhancement  enhancement[]
 
   @@map("enhancements_patterns")
+}
+
+model equipment {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String    @db.VarChar(32)
+  slot       String    @db.VarChar(32)
+  created_at DateTime  @default(now())
+  deleted_at DateTime?
+  updated_at DateTime  @updatedAt
+  item       item[]
+
+  @@map("equipments")
+}
+
+model rarity {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String    @db.VarChar(32)
+  color      String    @db.VarChar(32)
+  created_at DateTime  @default(now())
+  deleted_at DateTime?
+  updated_at DateTime  @updatedAt
+  item       item[]
+
+  @@map("rarities")
+}
+
+model race {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String    @db.VarChar(32)
+  created_at DateTime  @default(now())
+  deleted_at DateTime?
+  updated_at DateTime  @updatedAt
+  monster    monster[]
+
+  @@map("races")
 }
 
 model faction {
@@ -249,9 +288,8 @@ model hair_shop_item {
   created_at   DateTime  @default(now())
   deleted_at   DateTime?
   updated_at   DateTime  @updatedAt
-
-  hair      hair      @relation(fields: [hair_id], references: [id])
-  hair_shop hair_shop @relation(fields: [hair_shop_id], references: [id])
+  hair         hair      @relation(fields: [hair_id], references: [id])
+  hair_shop    hair_shop @relation(fields: [hair_shop_id], references: [id])
 
   @@index([hair_id], map: "hair_id")
   @@index([hair_shop_id], map: "hair_shop_id")
@@ -259,42 +297,47 @@ model hair_shop_item {
 }
 
 model item {
-  id                     BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  // type_equipment_id      BigInt    @db.UnsignedBigInt
-  // type_rarity_id         BigInt    @db.UnsignedBigInt
-  // type_element_id        BigInt    @db.UnsignedBigInt
-  enhancement_id         BigInt    @db.UnsignedBigInt
-  req_level_id           BigInt    @db.UnsignedBigInt
-  req_faction_id         BigInt    @db.UnsignedBigInt
-  req_faction_reputation BigInt    @db.UnsignedBigInt
-  req_job_id             BigInt    @db.UnsignedBigInt
-  req_job_points         BigInt    @db.UnsignedBigInt
-  name                   String    @db.VarChar(32)
-  description            String    @db.VarChar(255)
-  file                   String    @db.VarChar(64)
-  linkage                String    @db.VarChar(64)
-  icon                   String    @db.VarChar(32)
+  id                     BigInt             @id @default(autoincrement()) @db.UnsignedBigInt
+  equipment_id           BigInt             @db.UnsignedBigInt
+  rarity_id              BigInt             @db.UnsignedBigInt
+  element_id             BigInt             @db.UnsignedBigInt
+  enhancement_id         BigInt             @db.UnsignedBigInt
+  req_level_id           BigInt             @db.UnsignedBigInt
+  req_faction_id         BigInt             @db.UnsignedBigInt
+  req_faction_reputation BigInt             @db.UnsignedBigInt
+  req_job_id             BigInt             @db.UnsignedBigInt
+  req_job_points         BigInt             @db.UnsignedBigInt
+  name                   String             @db.VarChar(32)
+  description            String             @db.VarChar(255)
+  file                   String             @db.VarChar(64)
+  linkage                String             @db.VarChar(64)
+  icon                   String             @db.VarChar(32)
   is_coins               Boolean
   is_temporary           Boolean
   is_upgrade             Boolean
   is_staff               Boolean
-  range                  BigInt    @db.UnsignedBigInt
-  cost                   BigInt    @db.UnsignedBigInt
-  quantity               BigInt    @db.UnsignedBigInt
-  stack                  BigInt    @db.UnsignedBigInt
-  quest_string_index     BigInt    @db.UnsignedBigInt
-  quest_string_value     BigInt    @db.UnsignedBigInt
-  created_at             DateTime  @default(now())
+  range                  BigInt             @db.UnsignedBigInt
+  cost                   BigInt             @db.UnsignedBigInt
+  quantity               BigInt             @db.UnsignedBigInt
+  stack                  BigInt             @db.UnsignedBigInt
+  quest_string_index     BigInt             @db.UnsignedBigInt
+  quest_string_value     BigInt             @db.UnsignedBigInt
+  created_at             DateTime           @default(now())
   deleted_at             DateTime?
-  updated_at             DateTime  @updatedAt
+  updated_at             DateTime           @updatedAt
+  equipment              equipment          @relation(fields: [equipment_id], references: [id])
+  rarity                 rarity             @relation(fields: [rarity_id], references: [id])
+  element                element            @relation(fields: [element_id], references: [id])
+  enhancement            enhancement        @relation(fields: [enhancement_id], references: [id])
+  req_faction            faction            @relation(fields: [req_faction_id], references: [id])
+  req_job                job                @relation(fields: [req_job_id], references: [id])
+  req_level              setting_level      @relation(fields: [req_level_id], references: [id])
+  requirements           item_requirement[] @relation("ItemRequirements")
+  required_by            item_requirement[] @relation("RequiredBy")
 
-  enhancement  enhancement        @relation(fields: [enhancement_id], references: [id])
-  req_level    setting_level      @relation(fields: [req_level_id], references: [id])
-  req_faction  faction            @relation(fields: [req_faction_id], references: [id])
-  req_job      job                @relation(fields: [req_job_id], references: [id])
-  requirements item_requirement[] @relation("ItemRequirements")
-  required_by  item_requirement[] @relation("RequiredBy")
-
+  @@index([equipment_id], map: "equipment_id")
+  @@index([rarity_id], map: "rarity_id")
+  @@index([element_id], map: "element_id")
   @@index([enhancement_id], map: "enhancement_id")
   @@index([req_level_id], map: "req_level_id")
   @@index([req_faction_id], map: "req_faction_id")
@@ -310,13 +353,49 @@ model item_requirement {
   created_at  DateTime  @default(now())
   deleted_at  DateTime?
   updated_at  DateTime  @updatedAt
-
-  item     item @relation("ItemRequirements", fields: [item_id], references: [id])
-  req_item item @relation("RequiredBy", fields: [req_item_id], references: [id])
+  item        item      @relation("ItemRequirements", fields: [item_id], references: [id])
+  req_item    item      @relation("RequiredBy", fields: [req_item_id], references: [id])
 
   @@index([item_id], map: "item_id")
   @@index([req_item_id], map: "req_item_id")
   @@map("items_requirements")
+}
+
+model monster {
+  id           BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  element_id   BigInt        @db.UnsignedBigInt
+  race_id      BigInt        @db.UnsignedBigInt
+  level_id     BigInt        @db.UnsignedBigInt
+  team_id      BigInt        @db.UnsignedBigInt
+  category     Category
+  name         String        @db.VarChar(32)
+  file         String        @db.VarChar(64)
+  linkage      String        @db.VarChar(64)
+  gold         BigInt        @db.UnsignedBigInt
+  coins        BigInt        @db.UnsignedBigInt
+  experience   BigInt        @db.UnsignedBigInt
+  class_points BigInt        @db.UnsignedBigInt
+  health       BigInt        @db.UnsignedBigInt
+  mana         BigInt        @db.UnsignedBigInt
+  dps          BigInt        @db.UnsignedBigInt
+  range        BigInt        @db.UnsignedBigInt
+  wisdom       BigInt        @db.UnsignedBigInt
+  strength     BigInt        @db.UnsignedBigInt
+  luck         BigInt        @db.UnsignedBigInt
+  dexterity    BigInt        @db.UnsignedBigInt
+  endurance    BigInt        @db.UnsignedBigInt
+  intelligence BigInt        @db.UnsignedBigInt
+  created_at   DateTime      @default(now())
+  deleted_at   DateTime?
+  updated_at   DateTime      @updatedAt
+  element      element       @relation(fields: [element_id], references: [id])
+  race         race          @relation(fields: [race_id], references: [id])
+  level        setting_level @relation(fields: [level_id], references: [id])
+
+  @@index([element_id], map: "element_id")
+  @@index([race_id], map: "race_id")
+  @@index([level_id], map: "level_id")
+  @@map("monsters")
 }
 
 model character {
