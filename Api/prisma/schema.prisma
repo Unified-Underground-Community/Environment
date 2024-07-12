@@ -512,19 +512,19 @@ model quest_reward {
 model server {
   id                   BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
   name                 String      @db.VarChar(32)
+  message_of_the_day   String      @db.VarChar(255)
   host                 String      @db.VarChar(32)
   port                 BigInt      @db.UnsignedBigInt
-  created_at           DateTime    @default(now())
-  deleted_at           DateTime?
-  updated_at           DateTime    @updatedAt
   chat                 BigInt      @db.UnsignedBigInt
-  is_online            Boolean
-  is_staff             Boolean
-  is_upgrade           Boolean
-  message_of_the_day   String      @db.VarChar(255)
   player_cap           BigInt      @db.UnsignedBigInt
   player_count         BigInt      @db.UnsignedBigInt
   player_count_highest BigInt      @db.UnsignedBigInt
+  is_online            Boolean
+  is_staff             Boolean
+  is_upgrade           Boolean
+  created_at           DateTime    @default(now())
+  deleted_at           DateTime?
+  updated_at           DateTime    @updatedAt
   characters           character[]
 
   @@map("servers")
@@ -643,14 +643,15 @@ model skill {
 }
 
 model skill_aura {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  skill_id   BigInt    @db.UnsignedBigInt
-  aura_id    BigInt    @db.UnsignedBigInt
-  created_at DateTime  @default(now())
+  id         BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  skill_id   BigInt      @db.UnsignedBigInt
+  aura_id    BigInt      @db.UnsignedBigInt
+  target     SkillTarget
+  created_at DateTime    @default(now())
   deleted_at DateTime?
-  updated_at DateTime  @updatedAt
-  aura       aura      @relation(fields: [aura_id], references: [id])
-  skill      skill     @relation(fields: [skill_id], references: [id])
+  updated_at DateTime    @updatedAt
+  aura       aura        @relation(fields: [aura_id], references: [id])
+  skill      skill       @relation(fields: [skill_id], references: [id])
 
   @@index([skill_id], map: "skill_id")
   @@index([aura_id], map: "aura_id")
@@ -659,6 +660,7 @@ model skill_aura {
 
 model character {
   id                BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id           BigInt              @db.UnsignedBigInt
   access_id         BigInt              @db.UnsignedBigInt
   level_id          BigInt              @db.UnsignedBigInt
   server_id         BigInt              @db.UnsignedBigInt
@@ -692,6 +694,7 @@ model character {
   created_at        DateTime            @default(now())
   updated_at        DateTime            @updatedAt
   deleted_at        DateTime?
+  user              user                @relation(fields: [user_id], references: [id])
   access            access              @relation(fields: [access_id], references: [id])
   guild             guild?              @relation(fields: [guild_id], references: [id])
   hair              hair                @relation(fields: [hair_id], references: [id])
@@ -702,6 +705,7 @@ model character {
   friend_by         character_friend[]  @relation("CharacterFriendFriend")
   character_item    character_item[]
 
+  @@index([user_id], map: "user_id")
   @@index([access_id], map: "access_id")
   @@index([level_id], map: "level_id")
   @@index([server_id], map: "server_id")
@@ -760,6 +764,19 @@ model character_item {
   @@index([item_id], map: "item_id")
   @@index([enhancement_id], map: "enhancement_id")
   @@map("characters_items")
+}
+
+model user {
+  id         BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  username   String      @db.VarChar(32)
+  password   String      @db.VarChar(255)
+  email      String      @db.VarChar(64)
+  created_at DateTime    @default(now())
+  updated_at DateTime    @updatedAt
+  deleted_at DateTime?
+  character  character[]
+
+  @@map("users")
 }
 
 enum Gender {
