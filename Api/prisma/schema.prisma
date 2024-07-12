@@ -171,10 +171,10 @@ model enhancement {
   created_at     DateTime            @default(now())
   deleted_at     DateTime?
   updated_at     DateTime            @updatedAt
+  character_item character_item[]
   level          setting_level       @relation(fields: [level_id], references: [id])
   pattern        enhancement_pattern @relation(fields: [pattern_id], references: [id])
   item           item[]
-  character_item character_item[]
 
   @@index([level_id], map: "level_id")
   @@index([pattern_id], map: "pattern_id")
@@ -239,9 +239,9 @@ model faction {
   created_at        DateTime            @default(now())
   deleted_at        DateTime?
   updated_at        DateTime            @updatedAt
+  character_faction character_faction[]
   item              item[]
   quest             quest[]
-  character_faction character_faction[]
 
   @@map("factions")
 }
@@ -326,6 +326,7 @@ model item {
   created_at             DateTime            @default(now())
   deleted_at             DateTime?
   updated_at             DateTime            @updatedAt
+  character_item         character_item[]
   element                element             @relation(fields: [element_id], references: [id])
   enhancement            enhancement         @relation(fields: [enhancement_id], references: [id])
   equipment              equipment           @relation(fields: [equipment_id], references: [id])
@@ -339,7 +340,6 @@ model item {
   quest_requirement      quest_requirement[]
   quest_reward           quest_reward[]
   shop_item              shop_item[]
-  character_item         character_item[]
 
   @@index([equipment_id], map: "equipment_id")
   @@index([rarity_id], map: "rarity_id")
@@ -394,10 +394,10 @@ model monster {
   created_at   DateTime       @default(now())
   deleted_at   DateTime?
   updated_at   DateTime       @updatedAt
+  area_monster area_monster[]
   element      element        @relation(fields: [element_id], references: [id])
   level        setting_level  @relation(fields: [level_id], references: [id])
   race         race           @relation(fields: [race_id], references: [id])
-  area_monster area_monster[]
   monster_drop monster_drop[]
 
   @@index([element_id], map: "element_id")
@@ -415,8 +415,8 @@ model monster_drop {
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
-  monster    monster   @relation(fields: [monster_id], references: [id])
   item       item      @relation(fields: [item_id], references: [id])
+  monster    monster   @relation(fields: [monster_id], references: [id])
 
   @@index([monster_id], map: "monster_id")
   @@index([item_id], map: "item_id")
@@ -449,9 +449,9 @@ model quest {
   created_at             DateTime            @default(now())
   deleted_at             DateTime?
   updated_at             DateTime            @updatedAt
-  req_level              setting_level       @relation(fields: [req_level_id], references: [id])
   req_faction            faction             @relation(fields: [req_faction_id], references: [id])
   req_job                job                 @relation(fields: [req_job_id], references: [id])
+  req_level              setting_level       @relation(fields: [req_level_id], references: [id])
   quest_area             quest_area[]
   quest_requirement      quest_requirement[]
   quest_reward           quest_reward[]
@@ -469,8 +469,8 @@ model quest_area {
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
-  quest      quest     @relation(fields: [quest_id], references: [id])
   area       area      @relation(fields: [area_id], references: [id])
+  quest      quest     @relation(fields: [quest_id], references: [id])
 
   @@index([quest_id], map: "quest_id")
   @@index([area_id], map: "area_id")
@@ -484,8 +484,8 @@ model quest_requirement {
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
-  quest      quest     @relation(fields: [quest_id], references: [id])
   item       item      @relation(fields: [item_id], references: [id])
+  quest      quest     @relation(fields: [quest_id], references: [id])
 
   @@index([quest_id], map: "quest_id")
   @@index([item_id], map: "item_id")
@@ -501,8 +501,8 @@ model quest_reward {
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
-  quest      quest     @relation(fields: [quest_id], references: [id])
   item       item      @relation(fields: [item_id], references: [id])
+  quest      quest     @relation(fields: [quest_id], references: [id])
 
   @@index([quest_id], map: "quest_id")
   @@index([item_id], map: "item_id")
@@ -514,17 +514,17 @@ model server {
   name                 String      @db.VarChar(32)
   host                 String      @db.VarChar(32)
   port                 BigInt      @db.UnsignedBigInt
+  created_at           DateTime    @default(now())
+  deleted_at           DateTime?
+  updated_at           DateTime    @updatedAt
+  chat                 BigInt      @db.UnsignedBigInt
+  is_online            Boolean
+  is_staff             Boolean
+  is_upgrade           Boolean
   message_of_the_day   String      @db.VarChar(255)
   player_cap           BigInt      @db.UnsignedBigInt
   player_count         BigInt      @db.UnsignedBigInt
   player_count_highest BigInt      @db.UnsignedBigInt
-  is_upgrade           Boolean
-  is_staff             Boolean
-  is_online            Boolean
-  chat                 BigInt      @db.UnsignedBigInt
-  created_at           DateTime    @default(now())
-  deleted_at           DateTime?
-  updated_at           DateTime    @updatedAt
   characters           character[]
 
   @@map("servers")
@@ -593,8 +593,8 @@ model shop_area {
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
-  shop       shop      @relation(fields: [shop_id], references: [id])
   area       area      @relation(fields: [area_id], references: [id])
+  shop       shop      @relation(fields: [shop_id], references: [id])
 
   @@index([shop_id], map: "shop_id")
   @@index([area_id], map: "area_id")
@@ -609,8 +609,8 @@ model shop_item {
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
-  shop       shop      @relation(fields: [shop_id], references: [id])
   item       item      @relation(fields: [item_id], references: [id])
+  shop       shop      @relation(fields: [shop_id], references: [id])
 
   @@index([shop_id], map: "shop_id")
   @@index([item_id], map: "item_id")
@@ -649,8 +649,8 @@ model skill_aura {
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
-  skill      skill     @relation(fields: [skill_id], references: [id])
   aura       aura      @relation(fields: [aura_id], references: [id])
+  skill      skill     @relation(fields: [skill_id], references: [id])
 
   @@index([skill_id], map: "skill_id")
   @@index([aura_id], map: "aura_id")
@@ -722,6 +722,7 @@ model character_faction {
   faction      faction   @relation(fields: [faction_id], references: [id])
 
   @@index([faction_id], map: "faction_id")
+  @@index([character_id], map: "character_id")
   @@map("characters_factions")
 }
 
@@ -732,9 +733,8 @@ model character_friend {
   created_at   DateTime  @default(now())
   updated_at   DateTime  @updatedAt
   deleted_at   DateTime?
-
-  character character @relation("CharacterFriendCharacter", fields: [character_id], references: [id])
-  friend    character @relation("CharacterFriendFriend", fields: [friend_id], references: [id])
+  character    character @relation("CharacterFriendCharacter", fields: [character_id], references: [id])
+  friend       character @relation("CharacterFriendFriend", fields: [friend_id], references: [id])
 
   @@index([character_id], map: "character_id")
   @@index([friend_id], map: "friend_id")
@@ -742,20 +742,19 @@ model character_friend {
 }
 
 model character_item {
-  id             BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  character_id   BigInt    @db.UnsignedBigInt
-  item_id        BigInt    @db.UnsignedBigInt
-  enhancement_id BigInt    @db.UnsignedBigInt
-  quantity       BigInt    @db.UnsignedBigInt
+  id             BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  character_id   BigInt      @db.UnsignedBigInt
+  item_id        BigInt      @db.UnsignedBigInt
+  enhancement_id BigInt      @db.UnsignedBigInt
+  quantity       BigInt      @db.UnsignedBigInt
   is_equipped    Boolean
   is_banked      Boolean
-  created_at     DateTime  @default(now())
-  updated_at     DateTime  @updatedAt
+  created_at     DateTime    @default(now())
+  updated_at     DateTime    @updatedAt
   deleted_at     DateTime?
-
-  character   character   @relation(fields: [character_id], references: [id])
-  item        item        @relation(fields: [item_id], references: [id])
-  enhancement enhancement @relation(fields: [enhancement_id], references: [id])
+  character      character   @relation(fields: [character_id], references: [id])
+  enhancement    enhancement @relation(fields: [enhancement_id], references: [id])
+  item           item        @relation(fields: [item_id], references: [id])
 
   @@index([character_id], map: "character_id")
   @@index([item_id], map: "item_id")
