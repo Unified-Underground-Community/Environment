@@ -89,6 +89,7 @@ model area {
   req_access   access         @relation(fields: [req_access_id], references: [id])
   cells        area_cell[]
   area_item    area_item[]
+  area_monster area_monster[]
 
   @@index([req_level_id], map: "req_level_id")
   @@index([req_access_id], map: "req_access_id")
@@ -126,6 +127,26 @@ model area_item {
 
   @@index([area_id], map: "area_id")
   @@map("areas_items")
+}
+
+model area_monster {
+  id            BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  area_id       BigInt    @db.UnsignedBigInt
+  monster_id    BigInt    @db.UnsignedBigInt
+  area_mon_id   BigInt    @db.UnsignedBigInt
+  frame         String    @db.VarChar(32)
+  is_aggressive Boolean
+  created_at    DateTime  @default(now())
+  deleted_at    DateTime?
+  updated_at    DateTime  @updatedAt
+
+  area area @relation(fields: [area_id], references: [id])
+  // TODO:
+  // monster monster @relation(fields: [item_id], references: [id])
+  // @@index([item_id], map: "item_id")
+
+  @@index([area_id], map: "area_id")
+  @@map("areas_monsters")
 }
 
 model character {
