@@ -1,0 +1,104 @@
+services:
+
+    mariadb:
+        container_name: ${PROJECT_NAME}-mariadb
+        image: ${PROJECT_NAME}-mariadb:${PROJECT_NAME}-${PROJECT_VERSION}
+        build:
+            context: .
+            dockerfile: ${MARIADB_DOCKERFILE}/Dockerfile
+        ports:
+            - "${MARIADB_PORT}:${MARIADB_PORT}"
+        environment:
+            MYSQL_DATABASE: ${MARIADB_DATABASE}
+            MYSQL_USER: ${MARIADB_USERNAME}
+            MYSQL_PASSWORD: ${MARIADB_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${MARIADB_PASSWORD}
+        networks:
+            - unified
+        volumes:
+            - database:/var/lib/mysql
+
+    phpmyadmin:
+        container_name: ${PROJECT_NAME}-phpmyadmin
+        image: ${PROJECT_NAME}-phpmyadmin:${PROJECT_NAME}-${PROJECT_VERSION}
+        build:
+            context: .
+            dockerfile: ${PHPMYADMIN_DOCKERFILE}/Dockerfile
+        ports:
+            - "${PHPMYADMIN_PORT}:${PHPMYADMIN_PORT_MAP}"
+        environment:
+            PMA_HOST: ${PHPMYADMIN_PMA_HOST}
+            PMA_USER: ${MARIADB_USERNAME}
+            PMA_PASSWORD: ${MARIADB_PASSWORD}
+        networks:
+            - unified
+        depends_on:
+            - mariadb
+
+    client:
+        container_name: ${PROJECT_NAME}-client
+        image: ${PROJECT_NAME}-client:${PROJECT_NAME}-${PROJECT_VERSION}
+        build:
+            context: .
+            dockerfile: ${CLIENT_DOCKERFILE}/Dockerfile
+        ports:
+            - "${CLIENT_PORT}:${CLIENT_PORT}"
+        volumes:
+            - ${CLIENT_DIRECTORY}:${CLIENT_WORK_DIRECTORY}
+        working_dir: ${CLIENT_WORK_DIRECTORY}
+        command: /bin/sh -c "bun install && bun --bun run dev"
+        environment:
+            - NUXT_PORT=${CLIENT_PORT}
+            - NUXT_HOST=0.0.0.0
+        depends_on:
+            - mariadb
+
+    server:
+        container_name: ${PROJECT_NAME}-server
+        image: ${PROJECT_NAME}-server:${PROJECT_NAME}-${PROJECT_VERSION}
+        build:
+            context: .
+            dockerfile: ${SERVER_DOCKERFILE}/Dockerfile
+        ports:
+            - "${SERVER_PORT}:${SERVER_PORT}"
+        volumes:
+            - ${SERVER_DIRECTORY}:${SERVER_WORK_DIRECTORY}
+        working_dir: ${SERVER_WORK_DIRECTORY}
+        command: tail -F anything #/bin/sh -c "bun install && bun run src/Main.ts"
+        environment:
+            - MYSQL_DATABASE=${MARIADB_DATABASE}
+            - MYSQL_USER=${MARIADB_USERNAME}
+            - MYSQL_PASSWORD=${MARIADB_PASSWORD}
+            - MYSQL_HOST=${MARIADB_HOST}
+            - SERVER_ID=1
+            - QUERY_LOG=true
+        depends_on:
+            - mariadb
+
+    api:
+        container_name: ${PROJECT_NAME}-api
+        image: ${PROJECT_NAME}-api:${PROJECT_NAME}-${PROJECT_VERSION}
+        build:
+            context: .
+            dockerfile: ${API_DOCKERFILE}/Dockerfile
+        ports:
+            - "${API_PORT}:${API_PORT}"
+        volumes:
+            - ${API_DIRECTORY}:${API_WORK_DIRECTORY}
+        working_dir: ${API_WORK_DIRECTORY}
+        command: /bin/sh -c "bun install && bun --bun run dev"
+        environment:
+            - EXPRESS_PORT=${API_PORT}
+            - DATABASE_URL=${MARIADB_URL}
+        depends_on:
+            - mariadb
+
+networks:
+    unified:
+        name: ${PROJECT_NAME}-network
+        driver: bridge
+
+volumes:
+    database:
+        name: ${PROJECT_NAME}-database
+        driver: local

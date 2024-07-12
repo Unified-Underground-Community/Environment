@@ -1,0 +1,44 @@
+# Docker
+.env
+
+# Client
+Client/node_modules
+Client/logs
+Client/*.log
+Client/npm-debug.log*
+Client/yarn-debug.log*
+Client/yarn-error.log*
+Client/pids
+Client/*.pid
+Client/*.seed
+Client/*.pid.lock
+Client/lib-cov
+Client/coverage
+Client/.nyc_outputClient/.grunt
+Client/bower_components
+Client/.lock-wscript
+Client/build/Release
+Client/jspm_packages/
+Client/typings/
+Client/.npm
+Client/.eslintcache
+Client/.node_repl_history
+Client/*.tgz
+Client/.yarn-integrity
+Client/.env
+Client/.cache
+Client/.next
+Client/.nuxt
+Client/dist
+Client/.vuepress/dist
+Client/.serverless
+Client/.idea
+Client/sw.*
+Client/.DS_Store
+Client/*.swp
+
+# Api
+Api/node_modules
+
+# Server
+Server/node_modules

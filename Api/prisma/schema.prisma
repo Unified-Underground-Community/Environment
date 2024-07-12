@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model access {
+  id         BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String      @db.VarChar(255)
+  created_at DateTime    @default(now())
+  deleted_at DateTime?
+  updated_at DateTime    @updatedAt
+  characters character[]
+
+  @@map("accesses")
+}
+
+model setting_level {
+  id             BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  health         BigInt      @db.UnsignedBigInt
+  mana           BigInt      @db.UnsignedBigInt
+  req_experience BigInt      @db.UnsignedBigInt
+  created_at     DateTime    @default(now())
+  deleted_at     DateTime?
+  updated_at     DateTime    @updatedAt
+  characters     character[]
+
+  @@map("settings_levels")
+}
+
+model server {
+  id          BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  name        String      @db.VarChar(255)
+  host        String      @db.VarChar(255)
+  port        BigInt      @db.UnsignedBigInt
+  cap_players BigInt      @db.UnsignedBigInt
+  created_at  DateTime    @default(now())
+  deleted_at  DateTime?
+  updated_at  DateTime    @updatedAt
+  characters  character[]
+
+  @@map("servers")
+}
+
+model hair {
+  id         BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  gender     Gender
+  name       String      @db.VarChar(255)
+  file       String      @db.VarChar(255)
+  created_at DateTime    @default(now())
+  deleted_at DateTime?
+  updated_at DateTime    @updatedAt
+  characters character[]
+
+  @@map("hairs")
+}
+
+model guild {
+  id         BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String      @db.VarChar(255)
+  created_at DateTime    @default(now())
+  deleted_at DateTime?
+  updated_at DateTime    @updatedAt
+  characters character[]
+
+  @@map("guilds")
+}
+
+model character {
+  id                BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  access_id         BigInt        @db.UnsignedBigInt
+  level_id          BigInt        @db.UnsignedBigInt
+  server_id         BigInt        @db.UnsignedBigInt
+  hair_id           BigInt        @db.UnsignedBigInt
+  guild_id          BigInt?       @db.UnsignedBigInt
+  guild_rank        BigInt        @db.UnsignedBigInt
+  name              String        @db.VarChar(255)
+  gender            Gender
+  coins             BigInt        @db.UnsignedBigInt
+  gold              BigInt        @db.UnsignedBigInt
+  experience        BigInt        @db.UnsignedBigInt
+  activation_flag   BigInt        @db.UnsignedBigInt
+  slots_bag         BigInt        @db.UnsignedBigInt
+  slots_bank        BigInt        @db.UnsignedBigInt
+  slots_house       BigInt        @db.UnsignedBigInt
+  color_skin        String        @db.VarChar(6)
+  color_eye         String        @db.VarChar(6)
+  color_hair        String        @db.VarChar(6)
+  color_base        String        @db.VarChar(6)
+  color_trim        String        @db.VarChar(6)
+  color_accessory   String        @db.VarChar(6)
+  area_last         String        @db.VarChar(64)
+  area_current      String        @db.VarChar(64)
+  quests_1          String        @db.VarChar(255)
+  quests_2          String        @db.VarChar(255)
+  quests_3          String        @db.VarChar(255)
+  quests_4          String        @db.VarChar(255)
+  quests_5          String        @db.VarChar(255)
+  quests_6          String        @db.VarChar(255)
+  is_permanent_mute Boolean
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+  deleted_at        DateTime?
+  access            access        @relation(fields: [access_id], references: [id])
+  guild             guild?        @relation(fields: [guild_id], references: [id])
+  hair              hair          @relation(fields: [hair_id], references: [id])
+  level             setting_level @relation(fields: [level_id], references: [id])
+  server            server        @relation(fields: [server_id], references: [id])
+
+  @@index([access_id], map: "access_id")
+  @@index([level_id], map: "level_id")
+  @@index([server_id], map: "server_id")
+  @@index([hair_id], map: "hair_id")
+  @@index([guild_id], map: "guild_id")
+  @@map("characters")
+}
+
+enum Gender {
+  M
+  F
+}
