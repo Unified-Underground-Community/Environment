@@ -30,6 +30,7 @@ model setting_level {
   characters     character[]
   areas          area[]
   enhancement    enhancement[]
+  item           item[]
 
   @@map("settings_levels")
 }
@@ -136,6 +137,7 @@ model job {
   deleted_at                DateTime?
   updated_at                DateTime    @updatedAt
   job_skill                 job_skill[]
+  item                      item[]
 
   @@map("jobs")
 }
@@ -169,6 +171,7 @@ model enhancement {
 
   level   setting_level       @relation(fields: [level_id], references: [id])
   pattern enhancement_pattern @relation(fields: [pattern_id], references: [id])
+  item    item[]
 
   @@index([level_id], map: "level_id")
   @@index([pattern_id], map: "pattern_id")
@@ -198,6 +201,7 @@ model faction {
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
+  item       item[]
 
   @@map("factions")
 }
@@ -252,6 +256,48 @@ model hair_shop_item {
   @@index([hair_id], map: "hair_id")
   @@index([hair_shop_id], map: "hair_shop_id")
   @@map("hairs_shops_items")
+}
+
+model item {
+  id                     BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  // type_equipment_id      BigInt    @db.UnsignedBigInt
+  // type_rarity_id         BigInt    @db.UnsignedBigInt
+  // type_element_id        BigInt    @db.UnsignedBigInt
+  enhancement_id         BigInt    @db.UnsignedBigInt
+  req_level_id           BigInt    @db.UnsignedBigInt
+  req_faction_id         BigInt    @db.UnsignedBigInt
+  req_faction_reputation BigInt    @db.UnsignedBigInt
+  req_job_id             BigInt    @db.UnsignedBigInt
+  req_job_points         BigInt    @db.UnsignedBigInt
+  name                   String    @db.VarChar(32)
+  description            String    @db.VarChar(255)
+  file                   String    @db.VarChar(64)
+  linkage                String    @db.VarChar(64)
+  icon                   String    @db.VarChar(32)
+  is_coins               Boolean
+  is_temporary           Boolean
+  is_upgrade             Boolean
+  is_staff               Boolean
+  range                  BigInt    @db.UnsignedBigInt
+  cost                   BigInt    @db.UnsignedBigInt
+  quantity               BigInt    @db.UnsignedBigInt
+  stack                  BigInt    @db.UnsignedBigInt
+  quest_string_index     BigInt    @db.UnsignedBigInt
+  quest_string_value     BigInt    @db.UnsignedBigInt
+  created_at             DateTime  @default(now())
+  deleted_at             DateTime?
+  updated_at             DateTime  @updatedAt
+
+  enhancement enhancement   @relation(fields: [enhancement_id], references: [id])
+  req_level   setting_level @relation(fields: [req_level_id], references: [id])
+  req_faction faction       @relation(fields: [req_faction_id], references: [id])
+  req_job     job           @relation(fields: [req_job_id], references: [id])
+
+  @@index([enhancement_id], map: "enhancement_id")
+  @@index([req_level_id], map: "req_level_id")
+  @@index([req_faction_id], map: "req_faction_id")
+  @@index([req_job_id], map: "req_job_id")
+  @@map("items")
 }
 
 model character {
