@@ -20,15 +20,16 @@ model access {
 }
 
 model setting_level {
-  id             BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
-  health         BigInt      @db.UnsignedBigInt
-  mana           BigInt      @db.UnsignedBigInt
-  req_experience BigInt      @db.UnsignedBigInt
-  created_at     DateTime    @default(now())
+  id             BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  health         BigInt        @db.UnsignedBigInt
+  mana           BigInt        @db.UnsignedBigInt
+  req_experience BigInt        @db.UnsignedBigInt
+  created_at     DateTime      @default(now())
   deleted_at     DateTime?
-  updated_at     DateTime    @updatedAt
+  updated_at     DateTime      @updatedAt
   characters     character[]
   areas          area[]
+  enhancement    enhancement[]
 
   @@map("settings_levels")
 }
@@ -150,14 +151,14 @@ model area_monster {
 }
 
 model job {
-  id                        BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  id                        BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
   category                  Category
-  description               String      @db.VarChar(255)
-  mana_regeneration_methods String      @db.VarChar(255)
-  stats_description         String      @db.VarChar(255)
-  created_at                DateTime    @default(now())
+  description               String        @db.VarChar(255)
+  mana_regeneration_methods String        @db.VarChar(255)
+  stats_description         String        @db.VarChar(255)
+  created_at                DateTime      @default(now())
   deleted_at                DateTime?
-  updated_at                DateTime    @updatedAt
+  updated_at                DateTime      @updatedAt
   job_skill                 job_skill[]
 
   @@map("jobs")
@@ -178,6 +179,41 @@ model job_skill {
 
   @@index([job_id], map: "job_id")
   @@map("jobs_skills")
+}
+
+model enhancement {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  level_id   BigInt    @db.UnsignedBigInt
+  pattern_id BigInt    @db.UnsignedBigInt
+  rarity     BigInt    @db.UnsignedBigInt
+  dps        BigInt    @db.UnsignedBigInt
+  created_at DateTime  @default(now())
+  deleted_at DateTime?
+  updated_at DateTime  @updatedAt
+
+  level   setting_level       @relation(fields: [level_id], references: [id])
+  pattern enhancement_pattern @relation(fields: [pattern_id], references: [id])
+
+  @@index([level_id], map: "level_id")
+  @@index([pattern_id], map: "pattern_id")
+  @@map("enhancements")
+}
+
+model enhancement_pattern {
+  id           BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  category     Category
+  wisdom       BigInt        @db.UnsignedBigInt
+  strength     BigInt        @db.UnsignedBigInt
+  luck         BigInt        @db.UnsignedBigInt
+  dexterity    BigInt        @db.UnsignedBigInt
+  endurance    BigInt        @db.UnsignedBigInt
+  inteliigence BigInt        @db.UnsignedBigInt
+  created_at   DateTime      @default(now())
+  deleted_at   DateTime?
+  updated_at   DateTime      @updatedAt
+  enhancement  enhancement[]
+
+  @@map("enhancements_pattern")
 }
 
 model character {
