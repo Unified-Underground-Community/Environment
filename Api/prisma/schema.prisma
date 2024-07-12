@@ -85,9 +85,10 @@ model area {
   deleted_at    DateTime?
   updated_at    DateTime  @updatedAt
 
-  req_level  setting_level @relation(fields: [req_level_id], references: [id])
-  req_access access        @relation(fields: [req_access_id], references: [id])
-  cells      area_cell[]
+  req_level    setting_level  @relation(fields: [req_level_id], references: [id])
+  req_access   access         @relation(fields: [req_access_id], references: [id])
+  cells        area_cell[]
+  area_item    area_item[]
 
   @@index([req_level_id], map: "req_level_id")
   @@index([req_access_id], map: "req_access_id")
@@ -108,6 +109,23 @@ model area_cell {
 
   @@index([area_id], map: "area_id")
   @@map("areas_cells")
+}
+
+model area_item {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  area_id    BigInt    @db.UnsignedBigInt
+  item_id    BigInt    @db.UnsignedBigInt
+  created_at DateTime  @default(now())
+  deleted_at DateTime?
+  updated_at DateTime  @updatedAt
+
+  area area @relation(fields: [area_id], references: [id])
+  // TODO:
+  // item item @relation(fields: [item_id], references: [id])
+  // @@index([item_id], map: "item_id")
+
+  @@index([area_id], map: "area_id")
+  @@map("areas_items")
 }
 
 model character {
