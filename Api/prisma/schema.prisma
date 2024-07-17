@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgres"
   url      = env("DATABASE_URL")
 }
 
 model access {
-  id         BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  id         BigInt      @id @default(autoincrement())
   name       String      @db.VarChar(255)
   created_at DateTime    @default(now())
   deleted_at DateTime?
@@ -20,12 +20,12 @@ model access {
 }
 
 model area {
-  id            BigInt         @id @default(autoincrement()) @db.UnsignedBigInt
-  req_level_id  BigInt         @db.UnsignedBigInt
-  req_access_id BigInt         @db.UnsignedBigInt
+  id            BigInt         @id @default(autoincrement())
+  req_level_id  BigInt
+  req_access_id BigInt
   name          String         @db.VarChar(255)
   file          String         @db.VarChar(64)
-  max_players   BigInt         @db.UnsignedBigInt
+  max_players   BigInt
   is_upgrade    Boolean
   is_staff      Boolean
   is_pvp        Boolean
@@ -40,15 +40,15 @@ model area {
   quest_area    quest_area[]
   shop_area     shop_area[]
 
-  @@index([req_level_id], map: "req_level_id")
-  @@index([req_access_id], map: "req_access_id")
+  @@index([req_level_id], map: "area_req_level_id")
+  @@index([req_access_id], map: "area_req_access_id")
   @@map("areas")
 }
 
 model area_cell {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  area_id    BigInt    @db.UnsignedBigInt
-  cell_id    BigInt    @db.UnsignedBigInt
+  id         BigInt    @id @default(autoincrement())
+  area_id    BigInt
+  cell_id    BigInt
   frame      String    @db.VarChar(32)
   pad        String    @db.VarChar(32)
   created_at DateTime  @default(now())
@@ -56,28 +56,28 @@ model area_cell {
   updated_at DateTime  @updatedAt
   area       area      @relation(fields: [area_id], references: [id])
 
-  @@index([area_id], map: "area_id")
+  @@index([area_id], map: "area_cell_area_id")
   @@map("areas_cells")
 }
 
 model area_item {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  area_id    BigInt    @db.UnsignedBigInt
-  item_id    BigInt    @db.UnsignedBigInt
+  id         BigInt    @id @default(autoincrement())
+  area_id    BigInt
+  item_id    BigInt
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
   area       area      @relation(fields: [area_id], references: [id])
 
-  @@index([area_id], map: "area_id")
+  @@index([area_id], map: "area_item_area_id")
   @@map("areas_items")
 }
 
 model area_monster {
-  id            BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  area_id       BigInt    @db.UnsignedBigInt
-  monster_id    BigInt    @db.UnsignedBigInt
-  area_mon_id   BigInt    @db.UnsignedBigInt
+  id            BigInt    @id @default(autoincrement())
+  area_id       BigInt
+  monster_id    BigInt
+  area_mon_id   BigInt
   frame         String    @db.VarChar(32)
   is_aggressive Boolean
   created_at    DateTime  @default(now())
@@ -86,16 +86,16 @@ model area_monster {
   area          area      @relation(fields: [area_id], references: [id])
   monster       monster   @relation(fields: [monster_id], references: [id])
 
-  @@index([area_id], map: "area_id")
-  @@index([monster_id], map: "monster_id")
+  @@index([area_id], map: "area_monster_area_id")
+  @@index([monster_id], map: "area_monster_monster_id")
   @@map("areas_monsters")
 }
 
 model aura {
-  id          BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  id          BigInt        @id @default(autoincrement())
   name        String        @db.VarChar(255)
-  stack       BigInt        @db.UnsignedBigInt
-  duration    BigInt        @db.UnsignedBigInt
+  stack       BigInt
+  duration    BigInt
   created_at  DateTime      @default(now())
   deleted_at  DateTime?
   updated_at  DateTime      @updatedAt
@@ -106,8 +106,8 @@ model aura {
 }
 
 model aura_effect {
-  id         BigInt         @id @default(autoincrement()) @db.UnsignedBigInt
-  aura_id    BigInt         @db.UnsignedBigInt
+  id         BigInt         @id @default(autoincrement())
+  aura_id    BigInt
   type       AuraEffectType
   value      Decimal        @db.Decimal(9, 2)
   created_at DateTime       @default(now())
@@ -115,12 +115,12 @@ model aura_effect {
   updated_at DateTime       @updatedAt
   aura       aura           @relation(fields: [aura_id], references: [id])
 
-  @@index([aura_id], map: "aura_id")
+  @@index([aura_id], map: "aura_effect_aura_id")
   @@map("auras_effects")
 }
 
 model job {
-  id                        BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  id                        BigInt        @id @default(autoincrement())
   category                  ClassCategory
   description               String        @db.VarChar(255)
   mana_regeneration_methods String        @db.VarChar(255)
@@ -136,22 +136,22 @@ model job {
 }
 
 model job_skill {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  job_id     BigInt    @db.UnsignedBigInt
-  skill_id   BigInt    @db.UnsignedBigInt
+  id         BigInt    @id @default(autoincrement())
+  job_id     BigInt
+  skill_id   BigInt
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
   job        job       @relation(fields: [job_id], references: [id])
   skill      skill     @relation(fields: [skill_id], references: [id])
 
-  @@index([skill_id], map: "skill_id")
-  @@index([job_id], map: "job_id")
+  @@index([skill_id], map: "job_skill_skill_id")
+  @@index([job_id], map: "job_skill_job_id")
   @@map("jobs_skills")
 }
 
 model element {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  id         BigInt    @id @default(autoincrement())
   name       String    @db.VarChar(32)
   created_at DateTime  @default(now())
   deleted_at DateTime?
@@ -163,11 +163,11 @@ model element {
 }
 
 model enhancement {
-  id             BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
-  level_id       BigInt              @db.UnsignedBigInt
-  pattern_id     BigInt              @db.UnsignedBigInt
-  rarity         BigInt              @db.UnsignedBigInt
-  dps            BigInt              @db.UnsignedBigInt
+  id             BigInt              @id @default(autoincrement())
+  level_id       BigInt
+  pattern_id     BigInt
+  rarity         BigInt
+  dps            BigInt
   created_at     DateTime            @default(now())
   deleted_at     DateTime?
   updated_at     DateTime            @updatedAt
@@ -176,20 +176,20 @@ model enhancement {
   pattern        enhancement_pattern @relation(fields: [pattern_id], references: [id])
   item           item[]
 
-  @@index([level_id], map: "level_id")
-  @@index([pattern_id], map: "pattern_id")
+  @@index([level_id], map: "enhancement_level_id")
+  @@index([pattern_id], map: "enhancement_pattern_id")
   @@map("enhancements")
 }
 
 model enhancement_pattern {
-  id           BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
+  id           BigInt              @id @default(autoincrement())
   category     EnhancementCategory
-  wisdom       BigInt              @db.UnsignedBigInt
-  strength     BigInt              @db.UnsignedBigInt
-  luck         BigInt              @db.UnsignedBigInt
-  dexterity    BigInt              @db.UnsignedBigInt
-  endurance    BigInt              @db.UnsignedBigInt
-  inteliigence BigInt              @db.UnsignedBigInt
+  wisdom       BigInt
+  strength     BigInt
+  luck         BigInt
+  dexterity    BigInt
+  endurance    BigInt
+  inteliigence BigInt
   created_at   DateTime            @default(now())
   deleted_at   DateTime?
   updated_at   DateTime            @updatedAt
@@ -199,7 +199,7 @@ model enhancement_pattern {
 }
 
 model equipment {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  id         BigInt    @id @default(autoincrement())
   name       String    @db.VarChar(32)
   slot       String    @db.VarChar(32)
   created_at DateTime  @default(now())
@@ -211,7 +211,7 @@ model equipment {
 }
 
 model rarity {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  id         BigInt    @id @default(autoincrement())
   name       String    @db.VarChar(32)
   color      String    @db.VarChar(32)
   created_at DateTime  @default(now())
@@ -223,7 +223,7 @@ model rarity {
 }
 
 model race {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  id         BigInt    @id @default(autoincrement())
   name       String    @db.VarChar(32)
   created_at DateTime  @default(now())
   deleted_at DateTime?
@@ -234,7 +234,7 @@ model race {
 }
 
 model faction {
-  id                BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
+  id                BigInt              @id @default(autoincrement())
   name              String              @db.VarChar(32)
   created_at        DateTime            @default(now())
   deleted_at        DateTime?
@@ -247,7 +247,7 @@ model faction {
 }
 
 model guild {
-  id         BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  id         BigInt      @id @default(autoincrement())
   name       String      @db.VarChar(255)
   created_at DateTime    @default(now())
   deleted_at DateTime?
@@ -258,7 +258,7 @@ model guild {
 }
 
 model hair {
-  id             BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
+  id             BigInt           @id @default(autoincrement())
   gender         Gender
   name           String           @db.VarChar(255)
   file           String           @db.VarChar(255)
@@ -272,7 +272,7 @@ model hair {
 }
 
 model hair_shop {
-  id             BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
+  id             BigInt           @id @default(autoincrement())
   name           String           @db.VarChar(32)
   created_at     DateTime         @default(now())
   deleted_at     DateTime?
@@ -283,31 +283,31 @@ model hair_shop {
 }
 
 model hair_shop_item {
-  id           BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  hair_id      BigInt    @db.UnsignedBigInt
-  hair_shop_id BigInt    @db.UnsignedBigInt
+  id           BigInt    @id @default(autoincrement())
+  hair_id      BigInt
+  hair_shop_id BigInt
   created_at   DateTime  @default(now())
   deleted_at   DateTime?
   updated_at   DateTime  @updatedAt
   hair         hair      @relation(fields: [hair_id], references: [id])
   hair_shop    hair_shop @relation(fields: [hair_shop_id], references: [id])
 
-  @@index([hair_id], map: "hair_id")
-  @@index([hair_shop_id], map: "hair_shop_id")
+  @@index([hair_id], map: "hair_shop_item_hair_id")
+  @@index([hair_shop_id], map: "hair_shop_item_hair_shop_id")
   @@map("hairs_shops_items")
 }
 
 model item {
-  id                     BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
-  element_id             BigInt              @db.UnsignedBigInt
-  enhancement_id         BigInt              @db.UnsignedBigInt
-  equipment_id           BigInt              @db.UnsignedBigInt
-  rarity_id              BigInt              @db.UnsignedBigInt
-  req_level_id           BigInt              @db.UnsignedBigInt
-  req_faction_id         BigInt              @db.UnsignedBigInt
-  req_faction_reputation BigInt              @db.UnsignedBigInt
-  req_job_id             BigInt              @db.UnsignedBigInt
-  req_job_points         BigInt              @db.UnsignedBigInt
+  id                     BigInt              @id @default(autoincrement())
+  element_id             BigInt
+  enhancement_id         BigInt
+  equipment_id           BigInt
+  rarity_id              BigInt
+  req_level_id           BigInt
+  req_faction_id         BigInt
+  req_faction_reputation BigInt
+  req_job_id             BigInt
+  req_job_points         BigInt
   name                   String              @db.VarChar(32)
   description            String              @db.VarChar(255)
   file                   String              @db.VarChar(64)
@@ -317,12 +317,12 @@ model item {
   is_temporary           Boolean
   is_upgrade             Boolean
   is_staff               Boolean
-  range                  BigInt              @db.UnsignedBigInt
-  cost                   BigInt              @db.UnsignedBigInt
-  quantity               BigInt              @db.UnsignedBigInt
-  stack                  BigInt              @db.UnsignedBigInt
-  quest_string_index     BigInt              @db.UnsignedBigInt
-  quest_string_value     BigInt              @db.UnsignedBigInt
+  range                  BigInt
+  cost                   BigInt
+  quantity               BigInt
+  stack                  BigInt
+  quest_string_index     BigInt
+  quest_string_value     BigInt
   created_at             DateTime            @default(now())
   deleted_at             DateTime?
   updated_at             DateTime            @updatedAt
@@ -341,56 +341,56 @@ model item {
   quest_reward           quest_reward[]
   shop_item              shop_item[]
 
-  @@index([equipment_id], map: "equipment_id")
-  @@index([rarity_id], map: "rarity_id")
-  @@index([element_id], map: "element_id")
-  @@index([enhancement_id], map: "enhancement_id")
-  @@index([req_level_id], map: "req_level_id")
-  @@index([req_faction_id], map: "req_faction_id")
-  @@index([req_job_id], map: "req_job_id")
+  @@index([equipment_id], map: "item_equipment_id")
+  @@index([rarity_id], map: "item_rarity_id")
+  @@index([element_id], map: "item_element_id")
+  @@index([enhancement_id], map: "item_enhancement_id")
+  @@index([req_level_id], map: "item_req_level_id")
+  @@index([req_faction_id], map: "item_req_faction_id")
+  @@index([req_job_id], map: "item_req_job_id")
   @@map("items")
 }
 
 model item_requirement {
-  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  item_id     BigInt    @db.UnsignedBigInt
-  req_item_id BigInt    @db.UnsignedBigInt
-  quantity    BigInt    @db.UnsignedBigInt
+  id          BigInt    @id @default(autoincrement())
+  item_id     BigInt
+  req_item_id BigInt
+  quantity    BigInt
   created_at  DateTime  @default(now())
   deleted_at  DateTime?
   updated_at  DateTime  @updatedAt
   item        item      @relation("ItemRequirements", fields: [item_id], references: [id])
   req_item    item      @relation("RequiredBy", fields: [req_item_id], references: [id])
 
-  @@index([item_id], map: "item_id")
-  @@index([req_item_id], map: "req_item_id")
+  @@index([item_id], map: "item_requirement_item_id")
+  @@index([req_item_id], map: "item_requirement_req_item_id")
   @@map("items_requirements")
 }
 
 model monster {
-  id            BigInt          @id @default(autoincrement()) @db.UnsignedBigInt
-  element_id    BigInt          @db.UnsignedBigInt
-  race_id       BigInt          @db.UnsignedBigInt
-  level_id      BigInt          @db.UnsignedBigInt
-  team_id       BigInt          @db.UnsignedBigInt
+  id            BigInt          @id @default(autoincrement())
+  element_id    BigInt
+  race_id       BigInt
+  level_id      BigInt
+  team_id       BigInt
   category      ClassCategory
   name          String          @db.VarChar(32)
   file          String          @db.VarChar(64)
   linkage       String          @db.VarChar(64)
-  gold          BigInt          @db.UnsignedBigInt
-  coins         BigInt          @db.UnsignedBigInt
-  experience    BigInt          @db.UnsignedBigInt
-  class_points  BigInt          @db.UnsignedBigInt
-  health        BigInt          @db.UnsignedBigInt
-  mana          BigInt          @db.UnsignedBigInt
-  dps           BigInt          @db.UnsignedBigInt
-  range         BigInt          @db.UnsignedBigInt
-  wisdom        BigInt          @db.UnsignedBigInt
-  strength      BigInt          @db.UnsignedBigInt
-  luck          BigInt          @db.UnsignedBigInt
-  dexterity     BigInt          @db.UnsignedBigInt
-  endurance     BigInt          @db.UnsignedBigInt
-  intelligence  BigInt          @db.UnsignedBigInt
+  gold          BigInt
+  coins         BigInt
+  experience    BigInt
+  class_points  BigInt
+  health        BigInt
+  mana          BigInt
+  dps           BigInt
+  range         BigInt
+  wisdom        BigInt
+  strength      BigInt
+  luck          BigInt
+  dexterity     BigInt
+  endurance     BigInt
+  intelligence  BigInt
   created_at    DateTime        @default(now())
   deleted_at    DateTime?
   updated_at    DateTime        @updatedAt
@@ -401,17 +401,17 @@ model monster {
   monster_drop  monster_drop[]
   monster_skill monster_skill[]
 
-  @@index([element_id], map: "element_id")
-  @@index([race_id], map: "race_id")
-  @@index([level_id], map: "level_id")
+  @@index([element_id], map: "monster_element_id")
+  @@index([race_id], map: "monster_race_id")
+  @@index([level_id], map: "monster_level_id")
   @@map("monsters")
 }
 
 model monster_drop {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  monster_id BigInt    @db.UnsignedBigInt
-  item_id    BigInt    @db.UnsignedBigInt
-  quantity   BigInt    @db.UnsignedBigInt
+  id         BigInt    @id @default(autoincrement())
+  monster_id BigInt
+  item_id    BigInt
+  quantity   BigInt
   chance     Decimal   @db.Decimal(9, 2)
   created_at DateTime  @default(now())
   deleted_at DateTime?
@@ -419,46 +419,46 @@ model monster_drop {
   item       item      @relation(fields: [item_id], references: [id])
   monster    monster   @relation(fields: [monster_id], references: [id])
 
-  @@index([monster_id], map: "monster_id")
-  @@index([item_id], map: "item_id")
+  @@index([monster_id], map: "monster_drop_monster_id")
+  @@index([item_id], map: "monster_drop_item_id")
   @@map("monsters_drops")
 }
 
 model monster_skill {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  monster_id BigInt    @db.UnsignedBigInt
-  skill_id   BigInt    @db.UnsignedBigInt
+  id         BigInt    @id @default(autoincrement())
+  monster_id BigInt
+  skill_id   BigInt
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
   monster    monster   @relation(fields: [monster_id], references: [id])
   skill      skill     @relation(fields: [skill_id], references: [id])
 
-  @@index([monster_id], map: "monster_id")
-  @@index([skill_id], map: "skill_id")
+  @@index([monster_id], map: "monster_skill_monster_id")
+  @@index([skill_id], map: "monster_skill_skill_id")
   @@map("monsters_skills")
 }
 
 model quest {
-  id                     BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
-  req_level_id           BigInt              @db.UnsignedBigInt
-  req_faction_id         BigInt              @db.UnsignedBigInt
-  req_faction_reputation BigInt              @db.UnsignedBigInt
-  req_job_id             BigInt              @db.UnsignedBigInt
-  req_job_points         BigInt              @db.UnsignedBigInt
+  id                     BigInt              @id @default(autoincrement())
+  req_level_id           BigInt
+  req_faction_id         BigInt
+  req_faction_reputation BigInt
+  req_job_id             BigInt
+  req_job_points         BigInt
   name                   String              @db.VarChar(32)
   description            String              @db.VarChar(255)
   end_text               String              @db.VarChar(255)
   reward_type            QuestReward
-  gold                   BigInt              @db.UnsignedBigInt
-  coins                  BigInt              @db.UnsignedBigInt
-  experience             BigInt              @db.UnsignedBigInt
-  class_points           BigInt              @db.UnsignedBigInt
-  reputation             BigInt              @db.UnsignedBigInt
-  slot                   BigInt              @db.UnsignedBigInt
-  value                  BigInt              @db.UnsignedBigInt
+  gold                   BigInt
+  coins                  BigInt
+  experience             BigInt
+  class_points           BigInt
+  reputation             BigInt
+  slot                   BigInt
+  value                  BigInt
   field                  String              @db.VarChar(32)
-  index                  BigInt              @db.UnsignedBigInt
+  index                  BigInt
   is_upgrade             Boolean
   is_staff               Boolean
   is_once                Boolean
@@ -479,40 +479,40 @@ model quest {
 }
 
 model quest_area {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  quest_id   BigInt    @db.UnsignedBigInt
-  area_id    BigInt    @db.UnsignedBigInt
+  id         BigInt    @id @default(autoincrement())
+  quest_id   BigInt
+  area_id    BigInt
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
   area       area      @relation(fields: [area_id], references: [id])
   quest      quest     @relation(fields: [quest_id], references: [id])
 
-  @@index([quest_id], map: "quest_id")
-  @@index([area_id], map: "area_id")
+  @@index([quest_id], map: "quest_area_quest_id")
+  @@index([area_id], map: "quest_area_area_id")
   @@map("quests_areas")
 }
 
 model quest_requirement {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  quest_id   BigInt    @db.UnsignedBigInt
-  item_id    BigInt    @db.UnsignedBigInt
+  id         BigInt    @id @default(autoincrement())
+  quest_id   BigInt
+  item_id    BigInt
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
   item       item      @relation(fields: [item_id], references: [id])
   quest      quest     @relation(fields: [quest_id], references: [id])
 
-  @@index([quest_id], map: "quest_id")
-  @@index([item_id], map: "item_id")
+  @@index([quest_id], map: "quest_requirement_quest_id")
+  @@index([item_id], map: "quest_requirement_item_id")
   @@map("quests_requirements")
 }
 
 model quest_reward {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  quest_id   BigInt    @db.UnsignedBigInt
-  item_id    BigInt    @db.UnsignedBigInt
-  quantity   BigInt    @db.UnsignedBigInt
+  id         BigInt    @id @default(autoincrement())
+  quest_id   BigInt
+  item_id    BigInt
+  quantity   BigInt
   chance     Decimal   @db.Decimal(9, 2)
   created_at DateTime  @default(now())
   deleted_at DateTime?
@@ -520,21 +520,21 @@ model quest_reward {
   item       item      @relation(fields: [item_id], references: [id])
   quest      quest     @relation(fields: [quest_id], references: [id])
 
-  @@index([quest_id], map: "quest_id")
-  @@index([item_id], map: "item_id")
+  @@index([quest_id], map: "quest_reward_quest_id")
+  @@index([item_id], map: "quest_reward_item_id")
   @@map("quests_rewards")
 }
 
 model server {
-  id                   BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  id                   BigInt      @id @default(autoincrement())
   name                 String      @db.VarChar(32)
   message_of_the_day   String      @db.VarChar(255)
   host                 String      @db.VarChar(32)
-  port                 BigInt      @db.UnsignedBigInt
-  chat                 BigInt      @db.UnsignedBigInt
-  player_cap           BigInt      @db.UnsignedBigInt
-  player_count         BigInt      @db.UnsignedBigInt
-  player_count_highest BigInt      @db.UnsignedBigInt
+  port                 BigInt
+  chat                 BigInt
+  player_cap           BigInt
+  player_count         BigInt
+  player_count_highest BigInt
   is_online            Boolean
   is_staff             Boolean
   is_upgrade           Boolean
@@ -547,9 +547,9 @@ model server {
 }
 
 model setting_core {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  id         BigInt    @id @default(autoincrement())
   name       String    @db.VarChar(32)
-  value      BigInt    @db.UnsignedBigInt
+  value      BigInt
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
@@ -558,10 +558,10 @@ model setting_core {
 }
 
 model setting_level {
-  id             BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
-  health         BigInt        @db.UnsignedBigInt
-  mana           BigInt        @db.UnsignedBigInt
-  req_experience BigInt        @db.UnsignedBigInt
+  id             BigInt        @id @default(autoincrement())
+  health         BigInt
+  mana           BigInt
+  req_experience BigInt
   created_at     DateTime      @default(now())
   deleted_at     DateTime?
   updated_at     DateTime      @updatedAt
@@ -576,9 +576,9 @@ model setting_level {
 }
 
 model setting_login {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  id         BigInt    @id @default(autoincrement())
   name       String    @db.VarChar(32)
-  value      BigInt    @db.UnsignedBigInt
+  value      BigInt
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
@@ -587,7 +587,7 @@ model setting_login {
 }
 
 model shop {
-  id         BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  id         BigInt      @id @default(autoincrement())
   name       String      @db.VarChar(32)
   is_upgrade Boolean
   is_staff   Boolean
@@ -603,48 +603,48 @@ model shop {
 }
 
 model shop_area {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  shop_id    BigInt    @db.UnsignedBigInt
-  area_id    BigInt    @db.UnsignedBigInt
+  id         BigInt    @id @default(autoincrement())
+  shop_id    BigInt
+  area_id    BigInt
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
   area       area      @relation(fields: [area_id], references: [id])
   shop       shop      @relation(fields: [shop_id], references: [id])
 
-  @@index([shop_id], map: "shop_id")
-  @@index([area_id], map: "area_id")
+  @@index([shop_id], map: "shop_area_shop_id")
+  @@index([area_id], map: "shop_area_area_id")
   @@map("shops_areas")
 }
 
 model shop_item {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  shop_id    BigInt    @db.UnsignedBigInt
-  item_id    BigInt    @db.UnsignedBigInt
-  quantity   BigInt    @db.UnsignedBigInt
+  id         BigInt    @id @default(autoincrement())
+  shop_id    BigInt
+  item_id    BigInt
+  quantity   BigInt
   created_at DateTime  @default(now())
   deleted_at DateTime?
   updated_at DateTime  @updatedAt
   item       item      @relation(fields: [item_id], references: [id])
   shop       shop      @relation(fields: [shop_id], references: [id])
 
-  @@index([shop_id], map: "shop_id")
-  @@index([item_id], map: "item_id")
+  @@index([shop_id], map: "shop_item_shop_id")
+  @@index([item_id], map: "shop_item_item_id")
   @@map("shops_items")
 }
 
 model skill {
-  id            BigInt          @id @default(autoincrement()) @db.UnsignedBigInt
+  id            BigInt          @id @default(autoincrement())
   name          String          @db.VarChar(32)
   description   String          @db.VarChar(255)
   icon          String          @db.VarChar(255)
   animation     String          @db.VarChar(64)
   strl          String          @db.VarChar(64)
   damage        Decimal         @db.Decimal(9, 2)
-  mana          BigInt          @db.UnsignedBigInt
-  cooldown      BigInt          @db.UnsignedBigInt
-  range         BigInt          @db.UnsignedBigInt
-  hits          BigInt          @db.UnsignedBigInt
+  mana          BigInt
+  cooldown      BigInt
+  range         BigInt
+  hits          BigInt
   reference     SkillReference
   type          SkillType
   target        SkillTarget
@@ -653,16 +653,16 @@ model skill {
   deleted_at    DateTime?
   updated_at    DateTime        @updatedAt
   job_skill     job_skill[]
-  skill_aura    skill_aura[]
   monster_skill monster_skill[]
+  skill_aura    skill_aura[]
 
   @@map("skills")
 }
 
 model skill_aura {
-  id         BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
-  skill_id   BigInt      @db.UnsignedBigInt
-  aura_id    BigInt      @db.UnsignedBigInt
+  id         BigInt      @id @default(autoincrement())
+  skill_id   BigInt
+  aura_id    BigInt
   target     SkillTarget
   created_at DateTime    @default(now())
   deleted_at DateTime?
@@ -676,23 +676,23 @@ model skill_aura {
 }
 
 model character {
-  id                BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
-  user_id           BigInt              @db.UnsignedBigInt
-  access_id         BigInt              @db.UnsignedBigInt
-  level_id          BigInt              @db.UnsignedBigInt
-  server_id         BigInt              @db.UnsignedBigInt
-  hair_id           BigInt              @db.UnsignedBigInt
-  guild_id          BigInt?             @db.UnsignedBigInt
-  guild_rank        BigInt              @db.UnsignedBigInt
+  id                BigInt              @id @default(autoincrement())
+  user_id           BigInt
+  access_id         BigInt
+  level_id          BigInt
+  server_id         BigInt
+  hair_id           BigInt
+  guild_id          BigInt?
+  guild_rank        BigInt
   name              String              @db.VarChar(255)
   gender            Gender
-  coins             BigInt              @db.UnsignedBigInt
-  gold              BigInt              @db.UnsignedBigInt
-  experience        BigInt              @db.UnsignedBigInt
-  activation_flag   BigInt              @db.UnsignedBigInt
-  slots_bag         BigInt              @db.UnsignedBigInt
-  slots_bank        BigInt              @db.UnsignedBigInt
-  slots_house       BigInt              @db.UnsignedBigInt
+  coins             BigInt
+  gold              BigInt
+  experience        BigInt
+  activation_flag   BigInt
+  slots_bag         BigInt
+  slots_bank        BigInt
+  slots_house       BigInt
   color_skin        String              @db.VarChar(6)
   color_eye         String              @db.VarChar(6)
   color_hair        String              @db.VarChar(6)
@@ -732,42 +732,42 @@ model character {
 }
 
 model character_faction {
-  id           BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  character_id BigInt    @db.UnsignedBigInt
-  faction_id   BigInt    @db.UnsignedBigInt
-  value        BigInt    @db.UnsignedBigInt
+  id           BigInt    @id @default(autoincrement())
+  character_id BigInt
+  faction_id   BigInt
+  value        BigInt
   created_at   DateTime  @default(now())
   updated_at   DateTime  @updatedAt
   deleted_at   DateTime?
   character    character @relation(fields: [character_id], references: [id])
   faction      faction   @relation(fields: [faction_id], references: [id])
 
-  @@index([faction_id], map: "faction_id")
-  @@index([character_id], map: "character_id")
+  @@index([faction_id], map: "character_faction_faction_id")
+  @@index([character_id], map: "character_faction_character_id")
   @@map("characters_factions")
 }
 
 model character_friend {
-  id           BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  character_id BigInt    @db.UnsignedBigInt
-  friend_id    BigInt    @db.UnsignedBigInt
+  id           BigInt    @id @default(autoincrement())
+  character_id BigInt
+  friend_id    BigInt
   created_at   DateTime  @default(now())
   updated_at   DateTime  @updatedAt
   deleted_at   DateTime?
   character    character @relation("CharacterFriendCharacter", fields: [character_id], references: [id])
   friend       character @relation("CharacterFriendFriend", fields: [friend_id], references: [id])
 
-  @@index([character_id], map: "character_id")
-  @@index([friend_id], map: "friend_id")
+  @@index([character_id], map: "character_friend_character_id")
+  @@index([friend_id], map: "character_friend_friend_id")
   @@map("characters_friends")
 }
 
 model character_item {
-  id             BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
-  character_id   BigInt      @db.UnsignedBigInt
-  item_id        BigInt      @db.UnsignedBigInt
-  enhancement_id BigInt      @db.UnsignedBigInt
-  quantity       BigInt      @db.UnsignedBigInt
+  id             BigInt      @id @default(autoincrement())
+  character_id   BigInt
+  item_id        BigInt
+  enhancement_id BigInt
+  quantity       BigInt
   is_equipped    Boolean
   is_banked      Boolean
   created_at     DateTime    @default(now())
@@ -777,14 +777,14 @@ model character_item {
   enhancement    enhancement @relation(fields: [enhancement_id], references: [id])
   item           item        @relation(fields: [item_id], references: [id])
 
-  @@index([character_id], map: "character_id")
-  @@index([item_id], map: "item_id")
-  @@index([enhancement_id], map: "enhancement_id")
+  @@index([character_id], map: "character_item_character_id")
+  @@index([item_id], map: "character_item_item_id")
+  @@index([enhancement_id], map: "character_item_enhancement_id")
   @@map("characters_items")
 }
 
 model user {
-  id         BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  id         BigInt      @id @default(autoincrement())
   username   String      @db.VarChar(32)
   password   String      @db.VarChar(255)
   email      String      @db.VarChar(64)

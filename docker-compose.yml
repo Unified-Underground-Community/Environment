@@ -1,39 +1,38 @@
 services:
 
-    mariadb:
-        container_name: ${PROJECT_NAME}-mariadb
-        image: ${PROJECT_NAME}-mariadb:${PROJECT_NAME}-${PROJECT_VERSION}
+    postgres:
+        container_name: ${PROJECT_NAME}-postgres
+        image: ${PROJECT_NAME}-postgres:${PROJECT_NAME}-${PROJECT_VERSION}
         build:
             context: .
-            dockerfile: ${MARIADB_DOCKERFILE}/Dockerfile
+            dockerfile: ${POSTGRES_DOCKERFILE}/Dockerfile
         ports:
-            - "${MARIADB_PORT}:${MARIADB_PORT}"
+            - "${POSTGRES_PORT}:${POSTGRES_PORT}"
         environment:
-            MYSQL_DATABASE: ${MARIADB_DATABASE}
-            MYSQL_USER: ${MARIADB_USERNAME}
-            MYSQL_PASSWORD: ${MARIADB_PASSWORD}
-            MYSQL_ROOT_PASSWORD: ${MARIADB_PASSWORD}
+            POSTGRES_USER: ${POSTGRES_USERNAME}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
         networks:
             - unified
         volumes:
-            - database:/var/lib/mysql
+            - postgres:/var/lib/postgresql/data
 
-    phpmyadmin:
-        container_name: ${PROJECT_NAME}-phpmyadmin
-        image: ${PROJECT_NAME}-phpmyadmin:${PROJECT_NAME}-${PROJECT_VERSION}
+    pgadmin:
+        container_name: ${PROJECT_NAME}-pgadmin
+        image: ${PROJECT_NAME}-pgadmin:${PROJECT_NAME}-${PROJECT_VERSION}
         build:
             context: .
-            dockerfile: ${PHPMYADMIN_DOCKERFILE}/Dockerfile
+            dockerfile: ${PGADMIN_DOCKERFILE}/Dockerfile
         ports:
-            - "${PHPMYADMIN_PORT}:${PHPMYADMIN_PORT_MAP}"
+            - "${PGADMIN_PORT}:${PGADMIN_PORT_MAP}"
         environment:
-            PMA_HOST: ${PHPMYADMIN_PMA_HOST}
-            PMA_USER: ${MARIADB_USERNAME}
-            PMA_PASSWORD: ${MARIADB_PASSWORD}
+            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+            PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
         networks:
             - unified
+        volumes:
+            - pgadmin:/var/lib/pgadmin
         depends_on:
-            - mariadb
+            - postgres
 
     client:
         container_name: ${PROJECT_NAME}-client
@@ -51,7 +50,7 @@ services:
             - NUXT_PORT=${CLIENT_PORT}
             - NUXT_HOST=0.0.0.0
         depends_on:
-            - mariadb
+            - postgres
 
     server:
         container_name: ${PROJECT_NAME}-server
@@ -66,14 +65,14 @@ services:
         working_dir: ${SERVER_WORK_DIRECTORY}
         command: tail -F anything #/bin/sh -c "bun install && bun run src/Main.ts"
         environment:
-            - MYSQL_DATABASE=${MARIADB_DATABASE}
-            - MYSQL_USER=${MARIADB_USERNAME}
-            - MYSQL_PASSWORD=${MARIADB_PASSWORD}
-            - MYSQL_HOST=${MARIADB_HOST}
+            - MYSQL_DATABASE=${POSTGRES_DATABASE}
+            - MYSQL_USER=${POSTGRES_USERNAME}
+            - MYSQL_PASSWORD=${POSTGRES_PASSWORD}
+            - MYSQL_HOST=${POSTGRES_HOST}
             - SERVER_ID=1
             - QUERY_LOG=true
         depends_on:
-            - mariadb
+            - postgres
 
     api:
         container_name: ${PROJECT_NAME}-api
@@ -89,9 +88,9 @@ services:
         command: /bin/sh -c "bun install && bun --bun run dev"
         environment:
             - EXPRESS_PORT=${API_PORT}
-            - DATABASE_URL=${MARIADB_URL}
+            - DATABASE_URL=${POSTGRES_URL}
         depends_on:
-            - mariadb
+            - postgres
 
 networks:
     unified:
@@ -99,6 +98,9 @@ networks:
         driver: bridge
 
 volumes:
-    database:
-        name: ${PROJECT_NAME}-database
+    postgres:
+        name: ${PROJECT_NAME}-postgres
+        driver: local
+    pgadmin:
+        name: ${PROJECT_NAME}-pgadmin
         driver: local
